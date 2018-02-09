@@ -5,7 +5,12 @@
 
 ### Screenshots
 
-* 2014 ![Sheet 2014](Sheet2014.png)
-* 2015 ![Sheet 2015](Sheet2015.png)
-* 2016 ![Sheet 2016](Sheet2016.png)
+#### 2014
+![Sheet 2014](Sheet2014.png)
+
+#### 2015
+![Sheet 2015](Sheet2015.png)
+
+#### 2016
+![Sheet 2016](Sheet2016.png)
 
