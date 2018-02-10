@@ -5,11 +5,11 @@ Option Explicit
 
 Sub SummarizeAllSheets()
     ' Run through all sheets
-    Dim current As Worksheet
+    Dim ws As Worksheet
     
-    For Each current In ActiveWorkbook.Worksheets
-        current.Activate
-        Application.StatusBar = "Processing " & current.Name
+    For Each ws In ActiveWorkbook.Worksheets
+        ws.Activate
+        Application.StatusBar = "Processing " & ws.Name
         Call SummerizeTicker
     Next
 End Sub
@@ -26,6 +26,8 @@ Sub SummerizeTicker()
     
     Dim openPrice As Currency
     Dim closePrice As Currency
+    Dim prevClosePrice As Currency
+    
     Dim yearlyChange As Double
     Dim yearlyPercChange As Double
     
@@ -50,27 +52,20 @@ Sub SummerizeTicker()
     Range("Q1") = "Values"
     summaryRow = 2
     
-    ' Init values
-    row = 2
-    ticker = Range("A" & row)
-    openPrice = Range("C" & row)
     totalVolume = 0
     greatestPercIncrease = 0#
     greatestPercDecrease = 0#
     greatestTotalVolume = 0
     
-    While ticker <> ""
-        prevTicker = ticker
-       
-        closePrice = Range("F" & row)
-        totalVolume = totalVolume + Range("G" & row)
-
-        row = row + 1
+    prevTicker = ""
+    
+    ' Add 1 extra blank row handle last ticker. Another way is to
+    ' handle it after the for loop.
+    For row = 2 To Cells(Rows.Count, 1).End(xlUp).row + 1
         ticker = Range("A" & row)
-
-        If ticker <> prevTicker Then 'Passed all data for one ticker, now summarize
-            Application.StatusBar = "Done with ticker: " + prevTicker
-            yearlyChange = closePrice - openPrice
+        If ticker <> prevTicker And row > 2 Then
+            Application.StatusBar = "Ticker: " + prevTicker
+            yearlyChange = prevClosePrice - openPrice
             Range("I" & summaryRow) = prevTicker
             Range("J" & summaryRow) = yearlyChange
             Range("J" & summaryRow).NumberFormat = "#.#0"
@@ -78,8 +73,8 @@ Sub SummerizeTicker()
             ' Optimized to use conditional format
             With Range("J" & summaryRow).FormatConditions
                 .Delete
-                .Add(xlCellValue, xlGreater, "0").Interior.Color = RGB(0, 255, 0)
-                .Add(xlCellValue, xlLessEqual, "0").Interior.Color = RGB(255, 0, 0)
+                .Add(xlCellValue, xlGreater, "0").Interior.Color = vbGreen
+                .Add(xlCellValue, xlLessEqual, "0").Interior.Color = vbRed
             End With
             
             ' Handle exceptions
@@ -109,12 +104,17 @@ Sub SummerizeTicker()
                 greatestTotalVolume = totalVolume
                 greatestTotalVolumeTicker = prevTicker
             End If
-            
             openPrice = Range("C" & row)
             summaryRow = summaryRow + 1
             totalVolume = 0
          End If
-    Wend
+         
+         totalVolume = totalVolume + Range("G" & row)
+         closePrice = Range("F" & row)
+         
+         prevTicker = ticker
+         prevClosePrice = closePrice
+    Next row
     
     Range("P2") = greatestPercIncreaseTicker
     Range("Q2") = greatestPercIncrease
@@ -126,6 +126,6 @@ Sub SummerizeTicker()
     Range("Q4") = greatestTotalVolume
     Range("Q4").NumberFormat = "#,###"
     
-    Application.StatusBar = "Done with Sheet " & ActiveSheet.Name
+   ' Application.StatusBar = "Done with Sheet " & ActiveSheet.Name
     
 End Sub
