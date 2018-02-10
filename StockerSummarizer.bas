@@ -26,7 +26,6 @@ Sub SummerizeTicker()
     
     Dim openPrice As Currency
     Dim closePrice As Currency
-    Dim prevClosePrice As Currency
     
     Dim yearlyChange As Double
     Dim yearlyPercChange As Double
@@ -65,7 +64,7 @@ Sub SummerizeTicker()
         ticker = Range("A" & row)
         If ticker <> prevTicker And row > 2 Then
             Application.StatusBar = "Ticker: " + prevTicker
-            yearlyChange = prevClosePrice - openPrice
+            yearlyChange = closePrice - openPrice
             Range("I" & summaryRow) = prevTicker
             Range("J" & summaryRow) = yearlyChange
             Range("J" & summaryRow).NumberFormat = "#.#0"
@@ -113,7 +112,6 @@ Sub SummerizeTicker()
          closePrice = Range("F" & row)
          
          prevTicker = ticker
-         prevClosePrice = closePrice
     Next row
     
     Range("P2") = greatestPercIncreaseTicker
